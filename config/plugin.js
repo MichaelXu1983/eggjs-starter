@@ -1,20 +1,23 @@
-'use strict';
-
-// had enabled by egg
-// exports.static = true;
-exports.validate = {
-  enable: true,
-  package: 'egg-validate',
-};
-exports.mysql = {
-  enable: true,
-  package: 'egg-mysql',
-};
-exports.cors = {
-  enable: true,
-  package: 'egg-cors',
-};
-exports.nunjucks = {
-  enable: true,
-  package: 'egg-view-nunjucks',
+/** @type Egg.EggPlugin */
+module.exports = {
+  // had enabled by egg
+  // static: {
+  //   enable: true,
+  // }
+  mysql: {
+    enable: true,
+    package: 'egg-mysql',
+  },
+  cors: {
+    enable: true,
+    package: 'egg-cors',
+  },
+  validate: {
+    enable: true,
+    package: 'egg-validate',
+  },
+  nunjucks: {
+    enable: true,
+    package: 'egg-view-nunjucks',
+  },
 };

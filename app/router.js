@@ -1,12 +1,10 @@
-'use strict';
-
 /**
  * @param {Egg.Application} app - egg application
  */
 module.exports = app => {
   const { router, controller } = app;
-  // app.redirect('/', '/news');
-  router.get('/', controller.home.index);
-  router.get('/news', controller.news.list);
-  router.get('/source', controller.source.index);
+  router.get('index', '/home/index', controller.home.index);
+  app.router.redirect('/', '/home/index', 302);
+  router.get('/api/v1/wxactivity', controller.v1.wxactivity.find);
+  router.post('/api/v1/wxactivity', controller.v1.wxactivity.create);
 };

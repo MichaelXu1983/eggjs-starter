@@ -1,30 +1,30 @@
 {
   "name": "eggjs-start",
   "version": "1.0.0",
-  "description": "微信服务号授权和JSSDK微服务",
+  "description": "基于 Egg.js 搭建的企业级应用脚手架，可以帮助开发团队和开发人员降低开发和维护成本",
   "private": true,
+  "egg": {
+    "declarations": true
+  },
   "dependencies": {
-    "egg": "^2.2.1",
-    "egg-cors": "^2.1.0",
+    "egg": "^2.15.1",
+    "egg-cors": "^2.2.3",
     "egg-mysql": "^3.0.0",
-    "egg-scripts": "^2.5.0",
-    "egg-validate": "^1.0.0",
-    "egg-view-nunjucks": "^2.2.0",
-    "moment": "^2.22.2",
-    "mz-modules": "^2.0.0"
+    "egg-scripts": "^2.11.0",
+    "egg-validate": "^2.0.2",
+    "egg-view-nunjucks": "^2.2.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",
-    "autod-egg": "^1.0.0",
-    "egg-bin": "^4.3.5",
-    "egg-ci": "^1.8.0",
-    "egg-mock": "^3.17.2",
-    "eslint": "^4.11.0",
-    "eslint-config-egg": "^6.0.0",
-    "webstorm-disable-index": "^1.2.0"
+    "autod-egg": "^1.1.0",
+    "egg-bin": "^4.11.0",
+    "egg-ci": "^1.11.0",
+    "egg-mock": "^3.21.0",
+    "eslint": "^5.13.0",
+    "eslint-config-egg": "^7.1.0"
   },
   "engines": {
-    "node": ">=8.9.0"
+    "node": ">=10.0.0"
   },
   "scripts": {
     "start": "egg-scripts start --daemon --title=egg-server-eggjs-start",
@@ -39,12 +39,12 @@
     "autod": "autod"
   },
   "ci": {
-    "version": "8"
+    "version": "10"
   },
   "repository": {
     "type": "git",
     "url": ""
   },
-  "author": "michael.xu1983@qq.com",
+  "author": "michael",
   "license": "MIT"
 }

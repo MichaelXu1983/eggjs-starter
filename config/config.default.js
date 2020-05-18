@@ -1,168 +1,160 @@
-'use strict';
-const fs = require('fs');
-const path = require('path');
+/* eslint valid-jsdoc: "off" */
 
-module.exports = appInfo => {
-  const config = {
-    env: appInfo.env,
-    name: appInfo.name,
-    keys: appInfo.name + '_1531466185250_9292',
+/**
+ * @param {Egg.EggAppInfo} appInfo app info
+ */
+const fs = require("fs");
+const path = require("path");
+
+module.exports = (appInfo) => {
+  /**
+   * built-in config
+   * @type {Egg.EggAppConfig}
+   **/
+  const {
+    baseDir,
+    name,
+    // pkg, HOME, root, env
+  } = appInfo;
+  const config = (exports = {
+    mysql: {
+      // 所有数据库配置的默认值
+      // default: {
+      //   database: null,
+      //   connectionLimit: 5,
+      // },
+      // 是否加载到 app 上，默认开启
+      app: true,
+      // 是否加载到 agent 上，默认关闭
+      agent: false,
+      debug: true,
+      clients: {
+        ms_activity: {
+          host: "x.x.x.x",
+          port: "3306",
+          user: "mysql",
+          password: "mysql",
+          database: "ms_activity",
+        },
+        ms_appconfig: {
+          host: "x.x.x.x",
+          port: "3306",
+          user: "mysql",
+          password: "mysql",
+          database: "ms_appconfig",
+        },
+      },
+    },
+    security: {
+      csrf: {
+        enable: false, // 开启或关闭安全插件
+        // headerName: 'x-csrf-token',
+        useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
+        cookieName: "csrfToken", // Cookie 中的字段名，默认为 csrfToken
+        sessionName: "csrfToken", // Session 中的字段名，默认为 csrfToken
+      },
+      methodnoallow: {
+        enable: true,
+      },
+      domainWhiteList: ["http://127.0.0.1:9527"],
+      //   ssrf: {
+      //     ipBlackList: [
+      //       '10.0.0.0/8', // 支持 IP 网段
+      //       '0.0.0.0/32',
+      //       '127.0.0.1',  // 支持指定 IP 地址
+      //     ],
+      //     // 配置了 checkAddress 时，ipBlackList 不会生效
+      //     checkAddress(ip) {
+      //       return ip !== '127.0.0.1';
+      //     },
+      //   },
+    },
+    // 将 logger 目录放到代码目录下
+    logger: {
+      dir: path.join(baseDir, "logs"),
+    },
+    cookies: {
+      httpOnly: true, // 默认就是 true
+      encrypt: true, // 加密传输
+      // sameSite: 'none|lax|strict', // strict:完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。lax:Get 请求发送，POST 表单、iframe、AJAX、Image 不发送。none:必须同时设置Secure属性（Cookie 只能通过 HTTPS 协议发送），否则无效。
+    },
     proxy: false,
-    pkg: appInfo.pkg,
-    baseDir: appInfo.baseDir,
-    HOME: appInfo.HOME,
-    workerStartTimeout: 600000,
-  };
-  config.session = {
-    maxAge: 86400000,
-    key: 'EGG_SESS',
-    httpOnly: true,
-    encrypt: true,
-    overwrite: true,
-    signed: true,
-    encode: '<Function encode>',
-    decode: '<Function decode>',
-    genid: '<Function anonymous>',
-  };
-  config.jsonp = {
-    limit: 50,
-    callback: [ '_callback', 'callback' ],
-    csrf: false,
-  };
-  config.httpclient = {
-    enableDNSCache: false,
-    dnsCacheMaxLength: 1000,
-    dnsCacheMaxAge: 10000,
-    request: {
-      timeout: 5000,
+    notfound: {
+      pageUrl: "",
     },
-    httpAgent: {
-      keepAlive: true,
-      freeSocketKeepAliveTimeout: 4000,
-      maxSockets: 9007199254740991,
-      maxFreeSockets: 256,
+    siteFile: {
+      "/favicon.ico": fs.readFileSync(
+        path.join(appInfo.baseDir, "app/public/favicon.ico")
+      ),
     },
-    httpsAgent: {
-      keepAlive: true,
-      freeSocketKeepAliveTimeout: 4000,
-      maxSockets: 9007199254740991,
-      maxFreeSockets: 256,
+    bodyParser: {
+      // 在调整 bodyParser 支持的 body 长度时，如果我们应用前面还有一层反向代理（Nginx），可能也需要调整它的配置，确保反向代理也支持同样长度的请求 body
+      enable: true,
+      encoding: "utf8",
+      formLimit: "1mb",
+      jsonLimit: "1mb",
+      textLimit: "1mb",
+      strict: true,
+      // @see https://github.com/hapijs/qs/blob/master/lib/parse.js#L8 for more options
+      queryString: {
+        arrayLimit: 100,
+        depth: 5,
+        parameterLimit: 1000,
+      },
+      onerror(err) {
+        err.message += ", check bodyParser config";
+        throw err;
+      },
     },
-  };
-  config.onerror = {
-    errorPageUrl: '',
-    appErrorFilter: null,
-  };
-  config.notfound = {
-    pageUrl: '',
+    httpclient: {
+      enableDNSCache: false,
+      dnsCacheLookupInterval: 10000,
+      dnsCacheMaxLength: 1000,
+
+      request: {
+        timeout: 5000,
+      },
+      httpAgent: {
+        keepAlive: true,
+        freeSocketTimeout: 4000,
+        maxSockets: Number.MAX_SAFE_INTEGER,
+        maxFreeSockets: 256,
+      },
+      httpsAgent: {
+        keepAlive: true,
+        freeSocketTimeout: 4000,
+        maxSockets: Number.MAX_SAFE_INTEGER,
+        maxFreeSockets: 256,
+      },
+    },
+    cluster: {
+      listen: {
+        port: 7002,
+        hostname: "0.0.0.0",
+        // path: '/var/run/egg.sock',
+      },
+    },
+    // use for cookie sign key, should change to your own and keep security
+    keys: name + "_1588058816005_963",
+    middleware: ["errorHandler", "robot"],
+    view: {
+      defaultViewEngine: "nunjucks",
+      mapping: {
+        ".tpl": "nunjucks",
+      },
+    },
+    robot: {
+      ua: [/Baiduspider/i],
+    },
+  });
+
+  // add your user config here
+  const userConfig = {
+    // myAppName: 'egg',
   };
 
-  config.view = {
-    defaultViewEngine: 'nunjucks',
-    mapping: {
-      '.tpl': 'nunjucks',
-    },
+  return {
+    ...config,
+    ...userConfig,
   };
-
-  config.siteFile = {
-    '/favicon.ico': fs.readFileSync(
-      path.join(appInfo.baseDir, 'app/public/favicon.png')
-    ),
-  };
-  config.cluster = {
-    listen: {
-      port: 7005,
-      hostname: 'localhost',
-      // path: '/var/run/egg.sock',
-    },
-  };
-  config.clusterClient = {
-    maxWaitTime: 60000,
-    responseTimeout: 60000,
-  };
-
-  config.middleware = [ 'robot', 'errorHandler' ];
-
-  config.robot = {
-    ua: [ /Baiduspider/i, /Googlebot/i, /iaskspider/i ],
-  };
-
-  config.errorHandler = {
-    match: '/',
-  };
-  config.security = {
-    domainWhiteList: [
-      'http://127.0.0.1:8080',
-      'http://127.0.0.1:9527',
-      'https://wx.tdreamer.xin',
-      'https://manage.tdreamer.xin',
-    ],
-    protocolWhiteList: [],
-    defaultMiddleware:
-      'csrf,hsts,methodnoallow,noopen,nosniff,csp,xssProtection,xframe,dta',
-    csrf: {
-      enable: true,
-      useSession: false,
-      ignoreJSON: false,
-      cookieName: 'csrfToken',
-      sessionName: 'csrfToken',
-      headerName: 'x-csrf-token',
-      bodyName: '_csrf',
-      queryName: '_csrf',
-      matching: '<Function anonymous>',
-    },
-    xframe: {
-      enable: true,
-      value: 'SAMEORIGIN',
-      matching: '<Function anonymous>',
-    },
-    hsts: {
-      enable: false,
-      maxAge: 31536000,
-      includeSubdomains: false,
-    },
-    dta: {
-      enable: true,
-      matching: '<Function anonymous>',
-    },
-    methodnoallow: {
-      enable: true,
-      matching: '<Function anonymous>',
-    },
-    noopen: {
-      enable: true,
-      matching: '<Function anonymous>',
-    },
-    nosniff: {
-      enable: true,
-      matching: '<Function anonymous>',
-    },
-    xssProtection: {
-      enable: true,
-      value: '1; mode=block',
-      matching: '<Function anonymous>',
-    },
-    csp: {
-      enable: false,
-      policy: {},
-    },
-    //   ssrf: {
-    //     ipBlackList: [
-    //       '10.0.0.0/8', // 支持 IP 网段
-    //       '0.0.0.0/32',
-    //       '127.0.0.1',  // 支持指定 IP 地址
-    //     ],
-    //     // 配置了 checkAddress 时，ipBlackList 不会生效
-    //     checkAddress(ip) {
-    //       return ip !== '127.0.0.1';
-    //     },
-    //   },
-  };
-  config.cors = {
-    // {string|Function} origin: '*',
-    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
-    credentials: true,
-  };
-
-  return config;
 };
