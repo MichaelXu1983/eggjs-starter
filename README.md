@@ -36,6 +36,12 @@
   - [编写 Service](#编写Service)
   - [单元测试](#单元测试)
 5. [发布](#发布)
+6. [附录](#附录)
+  - [插件](#插件)
+  - [定时任务](#定时任务)
+  - [框架扩展](#框架扩展)
+  - [启动自定义](#启动自定义)
+  - [日志](#日志)
 
 ## <a name="介绍">介绍</a>
 
@@ -446,9 +452,9 @@ const config = (exports = {
     },
     domainWhiteList: [
       'http://127.0.0.1:9527',
-      'https://wx.mysql.xin',
-      'http://wx.mysql.com',
-      'https://manage.mysql.xin',
+      'https://wx.tdreamer.xin',
+      'http://wx.tdreamer.com',
+      'https://manage.tdreamer.xin',
     ],
     //   ssrf: {
     //     ipBlackList: [
@@ -686,13 +692,13 @@ curl http://localhost:7002/ -A "Baiduspider"
 我们选择了最后一种配置方案，**配置即代码**，配置的变更也应该经过 review 后才能发布。应用包本身是可以部署在多个环境的，只需要指定运行环境即可。  
 
 **内置的 appInfo**  
-| appInfo | 说明 |
-| --- | --- |
-| pkg | package.json |
-| name | 应用名，同 pkg.name |
-| baseDir |  应用代码的目录 |
-| HOME | 用户目录，如 admin 账户为 /home/admin |
-| root | 应用根目录，只有在 local 和 unittest 环境下为 baseDir，其他都为 HOME|
+| appInfo | 说明 |  
+| --- | --- |  
+| pkg | package.json |  
+| name | 应用名，同 pkg.name |  
+| baseDir |  应用代码的目录 |  
+| HOME | 用户目录，如 admin 账户为 /home/admin |  
+| root | 应用根目录，只有在 local 和 unittest 环境下为 baseDir，其他都为 HOME|  
 
 ## <a name="业务开发">业务开发</a>
 ### <a name="配置路由映射">配置路由映射</a>
@@ -706,75 +712,110 @@ module.exports = app => {
 };
 ```
 
-### <a name="编写Controller">编写 Controller</a>
+### <a name="编写Controller">编写 Controller</a>  
+[`app/controller/wxactivity.js`](app/controller/wxactivity.js)  
+
 **什么是 Controller**  
 Controller 负责解析用户的输入，处理后返回相应的结果。  
 - 在 RESTful 接口中，Controller 接受用户的参数，从数据库中查找内容返回给用户或者将用户的请求更新到数据库中。  
 - 在 HTML 页面请求中，Controller 根据用户访问不同的 URL，渲染不同的模板得到 HTML 返回给用户。  
 - 在代理服务器中，Controller 将用户的请求转发到其他服务器上，并将其他服务器的处理结果返回给用户。  
 
+**大致步骤**  
 1. 获取用户通过 HTTP 传递过来的请求参数。
 2. 校验、组装参数。
 3. 调用 Service 进行业务处理，必要时处理转换 Service 的返回结果，让它适应用户的需求。
 4. 通过 HTTP 将结果响应给用户。
 
 > Controller 有 `class` 和 `exports` 两种编写方式，你可能需要参考 [Controller](https://eggjs.org/zh-cn/basics/controller.html) 文档  
-> Config 也有 `module.exports` 和 `exports` 的写法，具体参考 [Node.js modules](https://nodejs.org/api/modules.html#modules_exports_shortcut) 文档
+> Config 也有 `module.exports` 和 `exports` 的写法，具体参考 [Node.js modules](https://nodejs.org/api/modules.html#modules_exports_shortcut) 文档  
 
-[`app/controller/wxactivity.js`](/src/components/Exception/type.js)  
+**注意事项**  
+* 如果用户的请求 body 超过了我们配置的解析最大长度，会抛出一个状态码为 413 的异常  
+* 如果用户请求的 body 解析失败（错误的 JSON），会抛出一个状态码为 400 的异常  
+* 在调整 bodyParser 支持的 body 长度时，如果我们应用前面还有一层反向代理（Nginx），可能也需要调整它的配置，确保反向代理也支持同样长度的请求 body  
+* 由于浏览器和其他客户端实现的不确定性，为了保证 Cookie 可以写入成功，建议 value 通过 base64 编码或者其他形式 encode 之后再写入  
+* 由于浏览器对 Cookie 有长度限制限制，所以尽量不要设置太长的 Cookie。一般来说不要超过 4093 bytes。当设置的 Cookie value 大于这个值时，框架会打印一条警告日志  
 
-**获取 HTTP 请求参数**  
-- `ctx.queries` 可以获取相同的 key，类似 `GET /posts?category=egg&id=1&id=2&id=3`  
-- 虽然我们可以通过 URL 传递参数，但是还是有诸多限制：1.浏览器中会对 URL 的长度有所限制，如果需要传递的参数过多就会无法传递；2.服务端经常会将访问的完整 URL 记录到日志文件中，有一些敏感数据通过 URL 传递会不安全。（HTTP 协议中并不建议在通过 GET、HEAD 方法访问时传递 body，所以我们无法在 GET、HEAD 方法中按照此方法获取到内容）  
-- POST、PUT 和 DELETE 请求中的 body，最常用的两类格式分别是 JSON 和 Form。框架内置了 bodyParser 中间件来对这两类格式的请求 body 解析成 object 挂载到 ctx.request.body 上，并可以在 `config.default.js` 中配置限制属性。   
-- 如果用户的请求 body 超过了我们配置的解析最大长度，会抛出一个状态码为 413 的异常，如果用户请求的 body 解析失败（错误的 JSON），会抛出一个状态码为 400 的异常。  
-- 在调整 bodyParser 支持的 body 长度时，如果我们应用前面还有一层反向代理（Nginx），可能也需要调整它的配置，确保反向代理也支持同样长度的请求 body。  
-
-**获取上传的文件**  
-Todo
-
-**header**  
-Todo
-
-**Cookie**  
-Todo
-
-**Session**  
-Todo
-
-**参数校验**  
-Todo
-
-**调用 Service**  
-Todo
-
-**发送 HTTP 响应**  
-Todo
-
-
-### <a name="编写 service"编写 service</a>
+### <a name="编写service">编写 service</a>  
+[`app/service/wxactivity.js`](app/service/wxactivity.js)  
 
 在实际应用中，Controller 一般不会自己产出数据，也不会包含复杂的逻辑，复杂的过程应抽象为业务逻辑层 [Service](https://eggjs.org/zh-cn/basics/service.html)
 
-```js
-// app/service/wxactivity.js
-```
+* 保持 Controller 中的逻辑更加简洁  
+* 保持业务逻辑的独立性，抽象出来的 Service 可以被多个 Controller 重复调用  
+* 将逻辑和展现分离，更容易编写测试用例  
 
-### <a name="编写Controller">编写 Controller</a>
+**使用场景**  
+* 复杂数据的处理，比如要展现的信息需要从数据库获取，还要经过一定的规则计算，才能返回用户显示。或者计算完成后，更新到数据库  
+* 第三方服务的调用，比如 GitHub 信息获取等  
 
-```js
-// app/controller/home.js
-```
+**Service ctx**  
+* this.ctx.curl 发起网络调用  
+* this.ctx.service.otherService 调用其他 Service  
+* this.ctx.db 发起数据库调用等， db 可能是其他插件提前挂载到 app 上的模块  
+
+**注意事项**  
+* Service 文件必须放在 app/service 目录，可以支持多级目录，访问的时候可以通过目录名级联访问  
+* 一个 Service 文件只能包含一个类， 这个类需要通过 module.exports 的方式返回  
+* Service 需要通过 Class 的方式定义，父类必须是 egg.Service  
+* Service 不是单例，是 请求级别 的对象，框架在每次请求中首次访问 ctx  
+* service.xx 时延迟实例化，所以 Service 中可以通过 this.ctx 获取到当前请求的上下文  
 
 ### <a name="单元测试">单元测试</a>
+todo
 
-```js
-// app/controller/home.js
-```
-
-## <a name="发布">发布</a>
+## <a name="发布">发布</a>  
 
 ```bash
 $ npm start
 $ npm stop
 ```
+
+## <a name="附录">附录</a>  
+### <a name="插件列表">插件列表</a>  
+框架默认内置了企业级应用常用的插件：  
+* onerror 统一异常处理
+* Session Session 实现
+* i18n 多语言
+* watcher 文件和文件夹监控
+* multipart 文件流式上传
+* security 安全
+* development 开发环境配置
+* logrotator 日志切分
+* schedule 定时任务
+* static 静态服务器
+* jsonp jsonp 支持
+* view 模板引擎
+
+> 详情见：https://eggjs.org/zh-cn/basics/plugin.html  
+
+### <a name="框架扩展">框架扩展</a>  
+框架提供了多种扩展点扩展自身的功能：  
+* Application
+* Context
+* Request
+* Response
+* Helper  
+
+在开发中，我们既可以使用已有的扩展 API 来方便开发，也可以对以上对象进行自定义扩展，进一步加强框架的功能。  
+
+> 详情请见：https://eggjs.org/zh-cn/basics/extend.html#request  
+
+### <a name="启动自定义">启动自定义</a>  
+框架提供了统一的入口文件（app.js）进行启动过程自定义，这个文件返回一个 Boot 类，我们可以通过定义 Boot 类中的生命周期方法来执行启动应用过程中的初始化工作。  
+
+框架提供了这些[生命周期函数](https://eggjs.org/zh-cn/advanced/loader.html#life-cycles)供开发人员处理：  
+* 配置文件即将加载，这是最后动态修改配置的时机（configWillLoad）
+* 配置文件加载完成（configDidLoad）
+* 文件加载完成（didLoad）
+* 插件启动完毕（willReady）
+* worker 准备就绪（didReady）
+* 应用启动完成（serverDidReady）
+* 应用即将关闭（beforeClose）
+
+**注意事项**  
+* 在自定义生命周期函数中不建议做太耗时的操作，框架会有启动的超时检测  
+
+### <a name="日志">日志</a>  
+> 详情请见：https://eggjs.org/zh-cn/core/logger.html

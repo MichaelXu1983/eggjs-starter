@@ -50,6 +50,7 @@ class WXActivityService extends Service {
     const result = await appConfigDB.update('wx_activity', row, options);
 
     return result;
+
   }
 
   // 获取活动配置信息
@@ -59,11 +60,11 @@ class WXActivityService extends Service {
 
     const { ActivityCode } = data;
 
-    const info = await appConfigDB.select('wx_activity', {
+    const result = await appConfigDB.select('wx_activity', {
       where: { ActivityCode },
     });
 
-    return info;
+    return result;
   }
 }
 
