@@ -3,10 +3,10 @@
 /**
  * @param {Egg.EggAppInfo} appInfo app info
  */
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-module.exports = (appInfo) => {
+module.exports = appInfo => {
   /**
    * built-in config
    * @type {Egg.EggAppConfig}
@@ -30,33 +30,37 @@ module.exports = (appInfo) => {
       debug: true,
       clients: {
         ms_activity: {
-          host: "x.x.x.x",
-          port: "3306",
-          user: "mysql",
-          password: "mysql",
-          database: "ms_activity",
+          host: '120.79.26.168',
+          port: '3306',
+          user: 'tdreamer',
+          password: 'Qcq5rqH$AlNJXGpcf^L8',
+          database: 'ms_activity',
         },
         ms_appconfig: {
-          host: "x.x.x.x",
-          port: "3306",
-          user: "mysql",
-          password: "mysql",
-          database: "ms_appconfig",
+          host: '120.79.26.168',
+          port: '3306',
+          user: 'tdreamer',
+          password: 'Qcq5rqH$AlNJXGpcf^L8',
+          database: 'ms_appconfig',
         },
       },
     },
     security: {
       csrf: {
-        enable: false, // 开启或关闭安全插件
+        enable: true, // 开启或关闭安全插件
         // headerName: 'x-csrf-token',
         useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
-        cookieName: "csrfToken", // Cookie 中的字段名，默认为 csrfToken
-        sessionName: "csrfToken", // Session 中的字段名，默认为 csrfToken
+        ignoreJSON: true, // 在 SOP 的安全策略保护下，基本上所有的现代浏览器都不允许跨域发起 content-type 为 JSON 的请求，因此我们可以直接放过类型的 JSON 格式的请求
       },
       methodnoallow: {
         enable: true,
       },
-      domainWhiteList: ["http://127.0.0.1:9527"],
+      domainWhiteList: [
+        'http://127.0.0.1:9527',
+        'https://wx.tdreamer.xin',
+        'http://wx.tdreamer.com',
+        'https://manage.tdreamer.xin',
+      ],
       //   ssrf: {
       //     ipBlackList: [
       //       '10.0.0.0/8', // 支持 IP 网段
@@ -69,31 +73,43 @@ module.exports = (appInfo) => {
       //     },
       //   },
     },
+    jsonp: {
+      whiteList: [ /^https?:\/\/test.com\//, 'sub2.test.com' ], // 配置 referrer 白名单的方式来限制 JSONP 的第三方请求在可控范围之内
+      csrf: true,
+      callback: 'callback', // 识别 query 中的 `callback` 参数
+      limit: 100, // 函数名最长为 100 个字符
+    },
     // 将 logger 目录放到代码目录下
     logger: {
-      dir: path.join(baseDir, "logs"),
+      dir: path.join(baseDir, 'logs'),
     },
     cookies: {
-      httpOnly: true, // 默认就是 true
-      encrypt: true, // 加密传输
-      // sameSite: 'none|lax|strict', // strict:完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。lax:Get 请求发送，POST 表单、iframe、AJAX、Image 不发送。none:必须同时设置Secure属性（Cookie 只能通过 HTTPS 协议发送），否则无效。
+      maxAge: 24 * 60 * 60 * 1000, // 浏览器的最长保存时间，是一个从服务器当前时刻开始的毫秒数
+      path: '/', // 设置键值对生效的 URL 路径
+      domain: '', // 设置键值对生效的域名
+      httpOnly: true, // 设置键值对是否可以被 js 访问
+      encrypt: true, // 对 Cookie 进行加密
+      overwrite: true, // 后设置的值会覆盖前面设置的，防止发送两个 set-cookie 响应头
+      signed: false, // 默认为 true，用来防止前端对这个值进行篡改，但会导致获取不到前端或者其他系统设置的 cookie 的值，所以此处设置为 false
+      // secure: true, // 设置键值对只在 HTTPS 连接上传输
+      // sameSite: 'none|lax|strict', // strict:完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。lax:Get 请求发送，POST 表单、iframe、AJAX、Image 不发送。none:必须同时设置 Secure 属性（Cookie 只能通过 HTTPS 协议发送），否则无效。
     },
     proxy: false,
     notfound: {
-      pageUrl: "",
+      pageUrl: '',
     },
     siteFile: {
-      "/favicon.ico": fs.readFileSync(
-        path.join(appInfo.baseDir, "app/public/favicon.ico")
+      '/favicon.ico': fs.readFileSync(
+        path.join(appInfo.baseDir, 'app/public/favicon.ico')
       ),
     },
     bodyParser: {
       // 在调整 bodyParser 支持的 body 长度时，如果我们应用前面还有一层反向代理（Nginx），可能也需要调整它的配置，确保反向代理也支持同样长度的请求 body
       enable: true,
-      encoding: "utf8",
-      formLimit: "1mb",
-      jsonLimit: "1mb",
-      textLimit: "1mb",
+      encoding: 'utf8',
+      formLimit: '1mb',
+      jsonLimit: '1mb',
+      textLimit: '1mb',
       strict: true,
       // @see https://github.com/hapijs/qs/blob/master/lib/parse.js#L8 for more options
       queryString: {
@@ -102,7 +118,7 @@ module.exports = (appInfo) => {
         parameterLimit: 1000,
       },
       onerror(err) {
-        err.message += ", check bodyParser config";
+        err.message += ', check bodyParser config';
         throw err;
       },
     },
@@ -130,21 +146,21 @@ module.exports = (appInfo) => {
     cluster: {
       listen: {
         port: 7002,
-        hostname: "0.0.0.0",
+        hostname: '0.0.0.0',
         // path: '/var/run/egg.sock',
       },
     },
     // use for cookie sign key, should change to your own and keep security
-    keys: name + "_1588058816005_963",
-    middleware: ["errorHandler", "robot"],
+    keys: name + '_1588058816005_963',
+    middleware: [ 'errorHandler', 'robot' ],
     view: {
-      defaultViewEngine: "nunjucks",
+      defaultViewEngine: 'nunjucks',
       mapping: {
-        ".tpl": "nunjucks",
+        '.tpl': 'nunjucks',
       },
     },
     robot: {
-      ua: [/Baiduspider/i],
+      ua: [ /Baiduspider/i ],
     },
   });
 
