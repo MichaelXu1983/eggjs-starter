@@ -143,9 +143,11 @@
 |   ├── router.js                          // 映射 controller 文件，创建路由
 │   ├── controller                         // 用于解析用户的输入，处理后返回相应的结果
 │   |   └── home.js                        // 默认首页
-│   |   └── wxactivity.js                  // 活动配置相关
+│   |   ├── v1
+│   │   |   └──wxactivity.js               // 活动配置相关
 │   ├── service                            // 用于编写业务逻辑层
-│   |   └── wxactivity.js                  // 活动配置相关接口实际生效的业务逻辑
+│   |   ├── v1
+│   │   |   └──wxactivity.js               // 活动配置相关接口实际生效的业务逻辑
 │   ├── middleware (可选)                   // 用于编写中间件
 │   |   └── robot.js                       // 编写禁止百度爬虫访问中间件
 │   |   └── error_handler.js               // 统一错误处理
@@ -174,11 +176,15 @@
 |   ├── config.test.js (可选) 	           // 测试配置
 |   ├── config.local.js (可选)             // 本地配置
 |   └── config.unittest.js (可选)          // 单元测试配置
-└── test                                  // 用于单元测试
-    ├── middleware
-    |   └── robot.test.js
-    └── controller
-        └── home.test.js
+└── test                                  // 测试所使用到的 fixtures 和相关辅助脚本都应该放在此目录下
+│   ├── middleware
+│   |   └── robot.test.js
+│   └── controller
+│   |   ├── v1
+│   │   |   └──wxactivity.test.js         // 测试脚本文件统一按 ${filename}.test.js 命名，必须以 .test.js 作为文件后缀
+│   └── service
+│   |   ├── v1
+│   │   |   └──wxactivity.test.js         
 ```
 
 ## <a name="项目配置">项目配置</a>
@@ -764,8 +770,72 @@ Controller 负责解析用户的输入，处理后返回相应的结果。
 * Service 不是单例，是 请求级别 的对象，框架在每次请求中首次访问 ctx  
 * service.xx 时延迟实例化，所以 Service 中可以通过 this.ctx 获取到当前请求的上下文  
 
-### <a name="单元测试">单元测试</a>
-todo
+### <a name="单元测试">单元测试</a>  
+
+**为什么要单元测试**   
+
+先问我们自己以下几个问题：  
+* 你的代码质量如何度量？
+* 你是如何保证代码质量？
+* 你敢随时重构代码吗？
+* 你是如何确保重构的代码依然保持正确性？
+* 你是否有足够信心在没有测试的情况下随时发布你的代码？
+
+如果答案都比较犹豫，那么就证明我们非常需要单元测试。  
+
+它能带给我们很多保障：  
+* 代码质量持续有保障
+* 重构正确性保障
+* 增强自信心
+* 自动化运行
+
+应用的 Controller、Service、Helper、Extend 等代码，都必须有对应的单元测试保证代码质量。 当然，框架和插件的每个功能改动和重构都需要有相应的单元测试，并且要求尽量做到修改的代码能被 100% 覆盖到。  
+
+**测试工具和模块**   
+
+统一使用 egg-bin 来运行测试脚本， 自动将内置的 Mocha、co-mocha、power-assert，nyc 等模块组合引入到测试脚本中， 让我们聚焦精力在编写测试代码上，而不是纠结选择那些测试周边工具和模块。  
+
+**测试执行顺序**     
+
+Mocha 使用 before/after/beforeEach/afterEach 来处理前置后置任务，基本能处理所有问题。 每个用例会按 before -> beforeEach -> it -> afterEach -> after 的顺序执行，而且可以定义多个。  
+```js
+describe('egg test', () => {
+  before(() => console.log('order 1'));
+  before(() => console.log('order 2'));
+  after(() => console.log('order 6'));
+  beforeEach(() => console.log('order 3'));
+  afterEach(() => console.log('order 5'));
+  it('should worker', () => console.log('order 4'));
+});
+```  
+
+**异步测试**   
+
+egg-bin 支持测试异步调用，它支持多种写法：  
+```js
+// 使用返回 Promise 的方式
+it('should redirect', () => {
+  return app.httpRequest()
+    .get('/')
+    .expect(302);
+});
+
+// 使用 callback 的方式
+it('should redirect', done => {
+  app.httpRequest()
+    .get('/')
+    .expect(302, done);
+});
+
+// 使用 async
+it('should redirect', async () => {
+  await app.httpRequest()
+    .get('/')
+    .expect(302);
+});
+```  
+
+使用哪种写法取决于不同应用场景，如果遇到多个异步可以使用 async function，也可以拆分成多个测试用例。  
 
 ## <a name="发布">发布</a>  
 

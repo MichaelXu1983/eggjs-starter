@@ -1,8 +1,11 @@
 <html>
   <head>
-    <title>Hello {{name}}</title>
+    <title>{{name}}</title>
   </head>
   <body>
-    Hello {{ name }} !
+     <p>name: {{ name }}</p>
+     <p>version: {{ version }}</p>
+     <p>description: {{ description }}</p>
+     <p>author: {{ author }}</p>
   </body>
 </html>

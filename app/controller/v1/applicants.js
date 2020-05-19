@@ -28,7 +28,7 @@ class ApplicantsController extends Controller {
     ctx.status = 201;
   }
   // 获取当前活动配置信息
-  async find() {
+  async show() {
     const { ctx } = this;
     const start = Date.now();
     const data = ctx.request.query; // ctx.queries

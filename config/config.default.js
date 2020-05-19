@@ -30,17 +30,17 @@ module.exports = appInfo => {
       debug: true,
       clients: {
         ms_activity: {
-          host: '120.79.26.168',
+          host: 'mysql.com',
           port: '3306',
-          user: 'tdreamer',
-          password: 'Qcq5rqH$AlNJXGpcf^L8',
+          user: 'test_user',
+          password: 'test_password',
           database: 'ms_activity',
         },
         ms_appconfig: {
-          host: '120.79.26.168',
+          host: 'mysql.com',
           port: '3306',
-          user: 'tdreamer',
-          password: 'Qcq5rqH$AlNJXGpcf^L8',
+          user: 'test_user',
+          password: 'test_password',
           database: 'ms_appconfig',
         },
       },
@@ -50,16 +50,12 @@ module.exports = appInfo => {
         enable: true, // 开启或关闭安全插件
         // headerName: 'x-csrf-token',
         useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
-        ignoreJSON: true, // 在 SOP 的安全策略保护下，基本上所有的现代浏览器都不允许跨域发起 content-type 为 JSON 的请求，因此我们可以直接放过类型的 JSON 格式的请求
       },
       methodnoallow: {
         enable: true,
       },
       domainWhiteList: [
         'http://127.0.0.1:9527',
-        'https://wx.tdreamer.xin',
-        'http://wx.tdreamer.com',
-        'https://manage.tdreamer.xin',
       ],
       //   ssrf: {
       //     ipBlackList: [

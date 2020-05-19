@@ -38,14 +38,13 @@ class WXActivityController extends Controller {
     // 设置响应内容和响应状态码
     if (result && result.affectedRows === 1) {
       this.success('插入或更新成功', result, start);
+      ctx.status = 201;
     } else {
       this.fail('插入或更新失败', result, start);
     }
-    // ctx.body = result;
-    ctx.status = 201;
   }
   // 获取当前活动配置信息
-  async find() {
+  async show() {
     const { ctx } = this;
     const start = Date.now();
     const data = ctx.request.query; // ctx.queries
