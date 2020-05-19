@@ -82,6 +82,8 @@ module.exports = appInfo => {
     // 将 logger 目录放到代码目录下
     logger: {
       dir: path.join(baseDir, 'logs'),
+      level: 'INFO',
+      consoleLevel: 'INFO',
     },
     cookies: {
       maxAge: 24 * 60 * 60 * 1000, // 浏览器的最长保存时间，是一个从服务器当前时刻开始的毫秒数

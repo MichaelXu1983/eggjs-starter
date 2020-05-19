@@ -31,6 +31,7 @@ class WXActivityController extends Controller {
     // const req = Object.assign(ctx.request.body, { author });
 
     const data = ctx.request.body; // 默认post请求，get请求为：ctx.request.query，url参数为：ctx.params.id
+    // this.logger.debug('current user: %j', data);
 
     // 调用 Service 进行业务处理
     const result = await ctx.service.v1.wxactivity.create(data);

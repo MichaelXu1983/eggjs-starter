@@ -25,7 +25,7 @@ class WXActivityService extends Service {
       where: { ActivityCode },
       columns: [ 'Title' ],
     });
-
+    // this.ctx.logger.debug('debug info from service');
     if (info.length === 0) {
       // 未查询到活动信息，就插入，否则更新
       const result = await appConfigDB.insert('wx_activity', data);

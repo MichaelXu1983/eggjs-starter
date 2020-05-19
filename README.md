@@ -31,17 +31,17 @@
      - [编写禁止百度爬虫访问中间件](#编写禁止百度爬虫访问中间件) 
      - [配置管理](#配置管理) 
 4. [业务开发](#业务开发)
-  - [配置路由映射](#配置路由映射)
-  - [编写 Controller](#编写Controller)
-  - [编写 Service](#编写Service)
-  - [单元测试](#单元测试)
+     - [配置路由映射](#配置路由映射)
+     - [编写 Controller](#编写Controller)
+     - [编写 Service](#编写Service)
+     - [单元测试](#单元测试)
 5. [发布](#发布)
 6. [附录](#附录)
-  - [插件](#插件)
-  - [定时任务](#定时任务)
-  - [框架扩展](#框架扩展)
-  - [启动自定义](#启动自定义)
-  - [日志](#日志)
+     - [插件](#插件)
+     - [定时任务](#定时任务)
+     - [框架扩展](#框架扩展)
+     - [启动自定义](#启动自定义)
+     - [日志](#日志)
 
 ## <a name="介绍">介绍</a>
 
@@ -230,7 +230,9 @@ npm i -S egg-scripts
 >
 > 更多参数可查看  [egg-scripts](https://github.com/eggjs/egg-scripts)  和  [egg-cluster](https://github.com/eggjs/egg-cluster)  文档
 
-你也可以在  `config.{env}.js`  中配置指定端口启动
+你也可以在  `config.{env}.js`  中配置指定端口启动  
+
+> 参考：https://github.com/eggjs/egg/blob/master/config/config.default.js  
 
 ```javascript
 // config/config.default.js
