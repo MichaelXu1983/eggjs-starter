@@ -56,6 +56,9 @@ module.exports = appInfo => {
       },
       domainWhiteList: [
         'http://127.0.0.1:9527',
+        'https://wx.tdreamer.xin',
+        'http://wx.tdreamer.com',
+        'https://manage.tdreamer.xin',
       ],
       //   ssrf: {
       //     ipBlackList: [
@@ -115,10 +118,10 @@ module.exports = appInfo => {
         depth: 5,
         parameterLimit: 1000,
       },
-      onerror(err) {
-        err.message += ', check bodyParser config';
-        throw err;
-      },
+      // onerror(err) {
+      //   err.message += ', check bodyParser config';
+      //   throw err;
+      // },
     },
     httpclient: {
       enableDNSCache: false,

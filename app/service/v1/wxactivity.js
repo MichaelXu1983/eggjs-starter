@@ -26,31 +26,30 @@ class WXActivityService extends Service {
       columns: [ 'Title' ],
     });
     // this.ctx.logger.debug('debug info from service');
+    let result = null;
     if (info.length === 0) {
       // 未查询到活动信息，就插入，否则更新
-      const result = await appConfigDB.insert('wx_activity', data);
-
-      return result;
+      result = await appConfigDB.insert('wx_activity', data);
+    } else {
+      const row = {
+        Title,
+        Des,
+        StartTime,
+        EndTime,
+        IsTest,
+        ShareAppMessageView,
+        ShareTimelineView,
+        AddTime: moment().format(dateFormat),
+      };
+      const options = {
+        where: {
+          ActivityCode,
+        },
+      };
+      result = await appConfigDB.update('wx_activity', row, options);
     }
-    const row = {
-      Title,
-      Des,
-      StartTime,
-      EndTime,
-      IsTest,
-      ShareAppMessageView,
-      ShareTimelineView,
-      AddTime: moment().format(dateFormat),
-    };
-    const options = {
-      where: {
-        ActivityCode,
-      },
-    };
-    const result = await appConfigDB.update('wx_activity', row, options);
 
     return result;
-
   }
 
   // 获取活动配置信息

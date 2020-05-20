@@ -22,30 +22,26 @@ class BaseController extends Controller {
     };
   }
 
-  success(msg, data, start) {
+  success(msg, data) {
     this.ctx.body = {
       status: 'ok',
       msg: msg || '操作成功',
       data,
     };
-    const used = Date.now() - start;
-    this.ctx.set('show-response-time', used.toString());
     // ctx.redirect(url) //如果不在配置的白名单域名内，则禁止跳转
   }
 
-  fail(msg, data, start) {
+  fail(msg, data) {
     this.ctx.body = {
       status: 'error',
       msg: msg || '操作失败',
       data,
     };
-    const used = Date.now() - start;
-    this.ctx.set('show-response-time', used.toString());
   }
 
-  notFound(msg) {
-    msg = msg || 'not found';
-    this.ctx.throw(404, msg);
-  }
+  // notFound(msg) {
+  //   msg = msg || 'not found';
+  //   this.ctx.throw(404, msg);
+  // }
 }
 module.exports = BaseController;

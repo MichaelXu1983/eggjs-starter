@@ -1,21 +1,34 @@
-const { assert, app } = require('egg-mock/bootstrap');
+const { app, assert } = require('egg-mock/bootstrap');
 
-const mockActivityCode = 'lucky-bag';
+const mockActivityCode = 'test-20200520';
 
 describe('test/app/controller/v1/wxactivity.test.js', () => {
-  describe('POST /api/v1/wxactivity:ActivityCode', () => {
+  // before(() => console.log('order 1'));
+  // before(() => console.log('order 2'));
+  // after(() => console.log('order 6'));
+  // beforeEach(() => console.log('order 3'));
+  // afterEach(() => console.log('order 5'));
+  describe('POST /api/v1/wxactivity', () => {
     it('should status 200 and get the request body', () => {
       app.mockCsrf();
       return app
         .httpRequest()
         .post('/api/v1/wxactivity')
         .send({
-          ActivityCode: 'lucky-bag',
+          ActivityCode: mockActivityCode,
+          Title: '单元测试',
+          Des: '单元测试数据',
+          StartTime: null,
+          EndTime: null,
+          IsTest: 1,
+          ShareAppMessageView: 0,
+          ShareTimelineView: 0,
         })
         .set('Accept', 'application/json')
         .expect('Content-Type', /json/)
+        .expect(200)
         .then(response => {
-          assert(response.status, 201);
+          console.log(`response=>${JSON.stringify(response)}`);
         });
     });
   });
@@ -27,16 +40,11 @@ describe('test/app/controller/v1/wxactivity.test.js', () => {
       assert(res.status === 200);
     });
     it('should mock service error', () => {
-      app.mockServiceError(
-        'v1.wxactivity',
-        'find',
-        'mock wxactivity service error'
-      );
-      return app
-        .httpRequest()
-        .get('/api/v1/wxactivity?ActivityCode=lucky-bag')
+      app.mockServiceError('v1.wxactivity', 'find', 'mock user service error');
+      return app.httpRequest()
+        .get(`/api/v1/wxactivity?ActivityCode=${mockActivityCode}`)
         .expect(500)
-        .expect(/mock wxactivity service error/);
+        .expect(/mock user service error/);
     });
   });
 });

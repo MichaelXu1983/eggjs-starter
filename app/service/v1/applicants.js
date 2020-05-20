@@ -13,25 +13,29 @@ class ApplicantsService extends Service {
       where: { Tel },
       columns: [ 'RealName' ],
     });
-
+    let result = null;
     if (user.length === 0) {
       // 该用户未登记过
-      const result = await activityDB.insert(ActivityCode, data);
-
-      return result;
+      result = await activityDB.insert(ActivityCode, data);
     }
+    return result;
   }
 
-  // 获取登记信息
-  async find(data) {
+  // 获取登记信息列表
+  async list(data) {
     const { app } = this;
     const activityDB = app.mysql.get('ms_activity');
 
-    const { ActivityCode } = data;
+    const { ActivityCode, offset, limit } = data;
 
     const result = await activityDB.select(ActivityCode, {
+      offset: parseInt(offset),
+      limit: parseInt(limit),
       where: { ActivityCode },
-      orders: [[ 'AddTime', 'desc' ]],
+      orders: [
+        [ 'AddTime', 'desc' ],
+        [ 'id', 'desc' ],
+      ],
     });
 
     return result;

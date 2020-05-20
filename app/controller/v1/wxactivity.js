@@ -18,12 +18,11 @@ class WXActivityController extends Controller {
       ctx,
       // app,service,config,logger,
     } = this;
-    const start = Date.now();
     try {
       ctx.validate(this.createRule);
     } catch (err) {
       ctx.logger.warn(err.errors);
-      ctx.body = { success: false };
+      this.fail('参数错误', err);
       return;
     }
     // 组装参数
@@ -37,16 +36,14 @@ class WXActivityController extends Controller {
     const result = await ctx.service.v1.wxactivity.create(data);
     // 设置响应内容和响应状态码
     if (result && result.affectedRows === 1) {
-      this.success('插入或更新成功', result, start);
-      ctx.status = 201;
+      this.success('插入或更新成功', result);
     } else {
-      this.fail('插入或更新失败', result, start);
+      this.fail('插入或更新失败', result);
     }
   }
   // 获取当前活动配置信息
   async show() {
     const { ctx } = this;
-    const start = Date.now();
     const data = ctx.request.query; // ctx.queries
 
     const result = await ctx.service.v1.wxactivity.find(data);
@@ -58,9 +55,9 @@ class WXActivityController extends Controller {
     if (result.length !== 0) {
       // 设置活动来源标识，供其他服务调用识别
       ctx.cookies.set('ActivityCode', ctx.request.query.ActivityCode);
-      this.success('查询成功', result, start);
+      this.success('查询成功', result);
     } else {
-      this.fail('未查询到信息', result, start);
+      this.fail('未查询到信息', result);
     }
   }
 }

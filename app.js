@@ -10,11 +10,11 @@ module.exports = app => {
     // app.logger.info('egg latest version: %s', result.data.version);
   });
   // 自定义校验规则
-  app.validator.addRule('json', (rule, value) => {
-    try {
-      JSON.parse(value);
-    } catch (err) {
-      return 'must be json string';
-    }
-  });
+  // app.validator.addRule('json', (rule, value) => {
+  //   try {
+  //     JSON.parse(value);
+  //   } catch (err) {
+  //     return 'must be json string';
+  //   }
+  // });
 };
