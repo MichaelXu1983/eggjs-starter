@@ -1,3 +1,12 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-05-20 10:53:57
+ * @LastEditTime: 2020-05-21 12:27:33
+ * @LastEditors: Michael Xu
+ * @Description: 登记和获取登记列表单元测试
+ * @FilePath: /register/test/app/controller/v1/applicants.test.js
+ * @Blog: https://www.michaelxu.cn/
+ */
 const { app, assert } = require('egg-mock/bootstrap');
 
 const mockActivityCode = 'test-20200520';
@@ -14,7 +23,7 @@ describe('test/app/controller/v1/applicants.test.js', () => {
         .post('/api/v1/applicants')
         .send({
           RealName: '测试',
-          Tel: '13971111111',
+          Tel: Math.random().toString().slice(-11),
           Other: '',
         })
         .set('Accept', 'application/json')

@@ -1,3 +1,13 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-05-19 09:52:15
+ * @LastEditTime: 2020-05-21 12:10:07
+ * @LastEditors: Michael Xu
+ * @Description: 登记和获取登记列表
+ * @FilePath: /register/app/controller/v1/applicants.js
+ * @Blog: https://www.michaelxu.cn/
+ */
+
 const Controller = require('../../core/base_controller');
 
 class ApplicantsController extends Controller {
@@ -37,11 +47,7 @@ class ApplicantsController extends Controller {
     const { ctx } = this;
     const data = ctx.request.query; // ctx.queries
     const result = await ctx.service.v1.applicants.list(data);
-    if (result.length !== 0) {
-      this.success('查询成功', result);
-    } else {
-      this.fail('未查询到信息', result);
-    }
+    this.success('查询成功', result);
   }
 }
 module.exports = ApplicantsController;

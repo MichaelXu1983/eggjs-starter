@@ -1,7 +1,7 @@
 {
-  "name": "eggjs-start",
+  "name": "ms-register",
   "version": "1.0.0",
-  "description": "基于 Egg.js 搭建的企业级应用脚手架，可以帮助开发团队和开发人员降低开发和维护成本",
+  "description": "register service",
   "private": true,
   "egg": {
     "declarations": true
@@ -27,8 +27,8 @@
     "node": ">=10.0.0"
   },
   "scripts": {
-    "start": "egg-scripts start --daemon --title=egg-server-eggjs-start",
-    "stop": "egg-scripts stop --title=egg-server-eggjs-start",
+    "start": "egg-scripts start --daemon --title=egg-server-ms-register",
+    "stop": "egg-scripts stop --title=egg-server-ms-register",
     "dev": "egg-bin dev",
     "debug": "egg-bin debug",
     "test": "npm run lint -- --fix && npm run test-local",

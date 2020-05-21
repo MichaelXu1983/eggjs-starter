@@ -1,3 +1,12 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-04-28 17:09:38
+ * @LastEditTime: 2020-05-21 12:25:48
+ * @LastEditors: Michael Xu
+ * @Description: 活动信息设置和读取
+ * @FilePath: /register/app/controller/v1/wxactivity.js
+ * @Blog: https://www.michaelxu.cn/
+ */
 const Controller = require('../../core/base_controller');
 
 class WXActivityController extends Controller {
@@ -18,13 +27,7 @@ class WXActivityController extends Controller {
       ctx,
       // app,service,config,logger,
     } = this;
-    try {
-      ctx.validate(this.createRule);
-    } catch (err) {
-      ctx.logger.warn(err.errors);
-      this.fail('参数错误', err);
-      return;
-    }
+    this.validating('参数错误', this.createRule);
     // 组装参数
     // const author = ctx.session.userId;
     // const req = Object.assign(ctx.request.body, { author });
@@ -35,11 +38,7 @@ class WXActivityController extends Controller {
     // 调用 Service 进行业务处理
     const result = await ctx.service.v1.wxactivity.create(data);
     // 设置响应内容和响应状态码
-    if (result && result.affectedRows === 1) {
-      this.success('插入或更新成功', result);
-    } else {
-      this.fail('插入或更新失败', result);
-    }
+    this.success('插入或更新成功', result);
   }
   // 获取当前活动配置信息
   async show() {
@@ -52,13 +51,8 @@ class WXActivityController extends Controller {
     // console.log('ips' + ctx.ips);
     // console.log('ip' + ctx.ip);
 
-    if (result.length !== 0) {
-      // 设置活动来源标识，供其他服务调用识别
-      ctx.cookies.set('ActivityCode', ctx.request.query.ActivityCode);
-      this.success('查询成功', result);
-    } else {
-      this.fail('未查询到信息', result);
-    }
+    ctx.cookies.set('ActivityCode', ctx.request.query.ActivityCode);
+    this.success('查询成功', result);
   }
 }
 module.exports = WXActivityController;

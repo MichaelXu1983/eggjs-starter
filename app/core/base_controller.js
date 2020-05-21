@@ -1,3 +1,13 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-04-30 10:06:51
+ * @LastEditTime: 2020-05-21 11:40:32
+ * @LastEditors: Michael Xu
+ * @Description: 自定义 Controller 基类
+ * @FilePath: /register/app/core/base_controller.js
+ * @Blog: https://www.michaelxu.cn/
+ */
+
 const { Controller } = require('egg');
 class BaseController extends Controller {
   constructor(ctx) {
@@ -22,21 +32,47 @@ class BaseController extends Controller {
     };
   }
 
+  /**
+   * 调用正常情况的返回数据封装
+   * @param {string} msg  - 描述
+   * @param {object} data - 数据
+   */
   success(msg, data) {
     this.ctx.body = {
       status: 'ok',
       msg: msg || '操作成功',
       data,
     };
+    this.ctx.status = 200;
     // ctx.redirect(url) //如果不在配置的白名单域名内，则禁止跳转
   }
 
+  /**
+   * 处理失败，处理传入的失败原因
+   * @param {string} msg  - 描述
+   * @param {object} data - 数据
+   */
   fail(msg, data) {
     this.ctx.body = {
       status: 'error',
       msg: msg || '操作失败',
       data,
     };
+  }
+
+  /**
+   * 参数验证
+   * @param {string} msg  - 描述
+   * @param {object} rule - 规则
+   */
+  validating(msg, rule) {
+    try {
+      this.ctx.validate(rule);
+    } catch (err) {
+      this.ctx.logger.warn(err.errors);
+      this.fail(msg, err.errors);
+      return;
+    }
   }
 
   // notFound(msg) {

@@ -30,17 +30,17 @@ module.exports = appInfo => {
       debug: true,
       clients: {
         ms_activity: {
-          host: 'mysql.com',
+          host: '120.79.26.168',
           port: '3306',
-          user: 'test_user',
-          password: 'test_password',
+          user: 'tdreamer',
+          password: 'Qcq5rqH$AlNJXGpcf^L8',
           database: 'ms_activity',
         },
         ms_appconfig: {
-          host: 'mysql.com',
+          host: '120.79.26.168',
           port: '3306',
-          user: 'test_user',
-          password: 'test_password',
+          user: 'tdreamer',
+          password: 'Qcq5rqH$AlNJXGpcf^L8',
           database: 'ms_appconfig',
         },
       },
@@ -50,12 +50,17 @@ module.exports = appInfo => {
         enable: true, // 开启或关闭安全插件
         // headerName: 'x-csrf-token',
         useSession: false, // 默认为 false，当设置为 true 时，将会把 csrf token 保存到 Session 中
+        ignoreJSON: false, // 默认为 false，当设置为 true 时，将会放过所有 content-type 为 `application/json` 的请求(该选项已废弃，攻击者可以通过 flash + 307 来攻破，请不要在生产环境打开该选项！)
+        cookieName: 'csrfToken', // csrf token's cookie name
+        sessionName: 'csrfToken', // csrf token's session name
+        headerName: 'x-csrf-token', // request csrf token's name in header
+        bodyName: '_csrf', // request csrf token's name in body
+        queryName: '_csrf', // request csrf token's name in query
       },
       methodnoallow: {
         enable: true,
       },
       domainWhiteList: [
-        'http://127.0.0.1:9527',
         'https://wx.tdreamer.xin',
         'http://wx.tdreamer.com',
         'https://manage.tdreamer.xin',
@@ -94,6 +99,13 @@ module.exports = appInfo => {
       signed: false, // 默认为 true，用来防止前端对这个值进行篡改，但会导致获取不到前端或者其他系统设置的 cookie 的值，所以此处设置为 false
       // secure: true, // 设置键值对只在 HTTPS 连接上传输
       // sameSite: 'none|lax|strict', // strict:完全禁止第三方 Cookie，跨站点时，任何情况下都不会发送 Cookie。lax:Get 请求发送，POST 表单、iframe、AJAX、Image 不发送。none:必须同时设置 Secure 属性（Cookie 只能通过 HTTPS 协议发送），否则无效。
+    },
+    session: {
+      key: 'EGG_SESS', // 键名
+      maxAge: 8640 * 3600 * 1000, // 有效期
+      httpOnly: true, // 是否允许前端访问
+      signed: true, // 签名
+      encrypt: true, // 加密
     },
     proxy: false,
     notfound: {
@@ -154,6 +166,9 @@ module.exports = appInfo => {
     // use for cookie sign key, should change to your own and keep security
     keys: name + '_1588058816005_963',
     middleware: [ 'errorHandler', 'robot' ],
+    errorHandler: {
+      match: '/api',
+    },
     view: {
       defaultViewEngine: 'nunjucks',
       mapping: {

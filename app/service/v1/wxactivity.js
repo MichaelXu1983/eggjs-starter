@@ -1,3 +1,13 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-05-19 17:47:09
+ * @LastEditTime: 2020-05-21 11:57:31
+ * @LastEditors: Michael Xu
+ * @Description: 活动信息设置和读取
+ * @FilePath: /register/app/service/v1/wxactivity.js
+ * @Blog: https://www.michaelxu.cn/
+ */
+
 const Service = require('egg').Service;
 const moment = require('moment');
 

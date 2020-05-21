@@ -1,3 +1,12 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-05-20 11:38:50
+ * @LastEditTime: 2020-05-21 12:34:49
+ * @LastEditors: Michael Xu
+ * @Description: 统一错误处理
+ * @FilePath: /eggjs-starter/app/middleware/error_handler.js
+ * @Blog: https://www.michaelxu.cn/
+ */
 module.exports = (option, app) => {
   return async function(ctx, next) {
     try {
@@ -13,9 +22,6 @@ module.exports = (option, app) => {
           : err.message;
       // 从 error 对象上读出各个属性，设置到响应中
       ctx.body = { error };
-      // if (status === 422) {
-      //   ctx.body.detail = err.errors;
-      // }
       ctx.status = status;
     }
   };

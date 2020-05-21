@@ -1,3 +1,13 @@
+/*
+ * @Author: Michael Xu
+ * @Date: 2020-05-18 17:03:14
+ * @LastEditTime: 2020-05-21 11:57:07
+ * @LastEditors: Michael Xu
+ * @Description: 登记和获取登记列表
+ * @FilePath: /register/app/service/v1/applicants.js
+ * @Blog: https://www.michaelxu.cn/
+ */
+
 const Service = require('egg').Service;
 
 class ApplicantsService extends Service {
